@@ -1,13 +1,17 @@
 // ---------- بيانات الطلاب والمدرس ----------
 let students = JSON.parse(localStorage.getItem('students')) || [
-  {name:"يحيى حسين أحمد", codeA:"YHA1", codeB:"YHA2", activeA:true, activeB:true},
-  {name:"زياد ايهاب جمال", codeA:"ZIG1", codeB:"ZIG2", activeA:true, activeB:true},
-  {name:"محمد محمد هاشم", codeA:"MMH1", codeB:"MMH2", activeA:true, activeB:true},
-  {name:"عمر سعيد", codeA:"OS1", codeB:"OS2", activeA:true, activeB:true}
+  {name:"يحيى حسين أحمد", code:"YHA1", active:true},
+  {name:"زياد ايهاب جمال", code:"ZIG1", active:true},
+  {name:"محمد محمد هاشم", code:"MMH1", active:true},
+  {name:"عمر سعيد", code:"OS1", active:true}
 ];
 
-let teacher = {username:"admin", password:"1234", codeA:"TCH1", codeB:"TCH2"};
-let lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+let teacher = {username:"admin", password:"1234"};
+let lessons = JSON.parse(localStorage.getItem('lessons')) || [
+  {title:"حل على الدعامة في الانسان", yt:"https://www.youtube.com/embed/P_-OHiOmftg"},
+  {title:"كورس التأسيس لتالته ثانوي", yt:"https://www.youtube.com/embed/VNZ1ivdGhgE"},
+  {title:"الدعامة في النبات", yt:"https://www.youtube.com/embed/ocYoCZesMmA"}
+];
 let currentStudent = JSON.parse(localStorage.getItem('currentStudent')) || null;
 
 // ---------- Dark/Light Mode ----------
@@ -36,10 +40,10 @@ function showSection(sectionId){
 }
 
 // ---------- Student Login ----------
-function loginStudent(codeA, codeB){
-  const student = students.find(s => s.codeA === codeA && s.codeB === codeB);
+function loginStudent(code){
+  const student = students.find(s => s.code === code);
   if(!student) return 'الكود غير صحيح';
-  if(!student.activeA || !student.activeB) return 'الكود معطل';
+  if(!student.active) return 'الكود معطل';
   currentStudent = student;
   localStorage.setItem('currentStudent', JSON.stringify(currentStudent));
   document.getElementById('studentName').innerText = student.name;
@@ -52,9 +56,8 @@ function loginStudent(codeA, codeB){
 document.getElementById('loginBtn').onclick = ()=>{
   const type = document.getElementById('userType').value;
   if(type==='student'){
-    const codeA = document.getElementById('studentCodeA').value.trim();
-    const codeB = document.getElementById('studentCodeB').value.trim();
-    const err = loginStudent(codeA, codeB);
+    const code = document.getElementById('studentCode').value.trim();
+    const err = loginStudent(code);
     if(err) document.getElementById('loginMsg').innerText = err;
   } else {
     const username = document.getElementById('teacherUsername').value.trim();
@@ -89,16 +92,14 @@ window.addEventListener('load', ()=>{
 
 // ---------- Teacher Functions ----------
 function generateCode(){
-  const partA=Math.random().toString(36).substring(2,6).toUpperCase();
-  const partB=Math.random().toString(36).substring(2,6).toUpperCase();
-  return {codeA:partA, codeB:partB};
+  return Math.random().toString(36).substring(2,6).toUpperCase();
 }
 
 document.getElementById('addStudentBtn').onclick = ()=>{
   const name=document.getElementById('newStudentName').value.trim();
   if(!name) return alert('ادخل اسم الطالب');
-  const codes = generateCode();
-  students.push({id:Date.now(), name, codeA:codes.codeA, codeB:codes.codeB, activeA:true, activeB:true});
+  const code = generateCode();
+  students.push({name, code, active:true});
   localStorage.setItem('students',JSON.stringify(students));
   renderStudents();
   document.getElementById('newStudentName').value='';
@@ -109,21 +110,15 @@ function renderStudents(){
   list.innerHTML='';
   students.forEach((s,i)=>{
     const div=document.createElement('div');
-    div.innerHTML=`${s.name} | الكود A: ${s.codeA} | الكود B: ${s.codeB} | 
-    <button onclick="toggleStudentA(${i})">${s.activeA?'إيقاف A':'تفعيل A'}</button>
-    <button onclick="toggleStudentB(${i})">${s.activeB?'إيقاف B':'تفعيل B'}</button>`;
+    div.innerHTML=`${s.name} | الكود: ${s.code} | 
+    <button onclick="toggleStudent(${i})">${s.active?'إيقاف':'تفعيل'}</button>`;
     list.appendChild(div);
   });
 }
 
-function toggleStudentA(index){
-  students[index].activeA=!students[index].activeA;
-  localStorage.setItem('students',JSON.stringify(students));
-  renderStudents();
-}
-function toggleStudentB(index){
-  students[index].activeB=!students[index].activeB;
-  localStorage.setItem('students',JSON.stringify(students));
+function toggleStudent(index){
+  students[index].active = !students[index].active;
+  localStorage.setItem('students', JSON.stringify(students));
   renderStudents();
 }
 
@@ -131,14 +126,12 @@ function toggleStudentB(index){
 document.getElementById('addLessonBtn').onclick = ()=>{
   const title=document.getElementById('lessonTitle').value.trim();
   const yt=document.getElementById('lessonYouTube').value.trim();
-  const form=document.getElementById('lessonForm').value.trim();
   if(!title || !yt) return alert('ادخل العنوان ورابط الفيديو');
-  lessons.push({title, yt, form});
+  lessons.push({title, yt});
   localStorage.setItem('lessons',JSON.stringify(lessons));
   renderLessonsTeacher();
   document.getElementById('lessonTitle').value='';
   document.getElementById('lessonYouTube').value='';
-  document.getElementById('lessonForm').value='';
 }
 
 function renderLessonsTeacher(){
