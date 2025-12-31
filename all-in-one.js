@@ -1,22 +1,22 @@
-// تنظيف LocalStorage القديم لمرة واحدة
-if(!localStorage.getItem('students')) {
-  localStorage.removeItem('students');
-  localStorage.removeItem('currentStudent');
-  localStorage.removeItem('lessons');
-}// ---------- بيانات الطلاب والمدرس ----------
-let students = JSON.parse(localStorage.getItem('students')) || [
+// ---------- بيانات الطلاب والمدرس ----------
+let defaultStudents = [
   {name:"يحيى حسين أحمد", codeA:"YHA1", codeB:"YHA2", active:true},
   {name:"زياد ايهاب جمال", codeA:"ZIG1", codeB:"ZIG2", active:true},
   {name:"محمد محمد هاشم", codeA:"MMH1", codeB:"MMH2", active:true},
   {name:"عمر سعيد", codeA:"OS1", codeB:"OS2", active:true}
 ];
 
+let students = JSON.parse(localStorage.getItem('students')) || defaultStudents;
+
 let teacher = {username:"admin", password:"1234"};
-let lessons = JSON.parse(localStorage.getItem('lessons')) || [
+
+let defaultLessons = [
   {title:"حل على الدعامة في الانسان", yt:"https://www.youtube.com/embed/P_-OHiOmftg"},
   {title:"كورس التأسيس لتالته ثانوي", yt:"https://www.youtube.com/embed/VNZ1ivdGhgE"},
   {title:"الدعامة في النبات", yt:"https://www.youtube.com/embed/ocYoCZesMmA"}
 ];
+
+let lessons = JSON.parse(localStorage.getItem('lessons')) || defaultLessons;
 
 let currentStudent = JSON.parse(localStorage.getItem('currentStudent')) || null;
 
@@ -47,6 +47,12 @@ function showSection(sectionId){
 
 // ---------- Student Login ----------
 function loginStudent(codeA, codeB){
+  // إعادة ضبط الكود إذا كان LocalStorage يحتوي على كود قديم
+  if(!students || students.length === 0){
+    students = defaultStudents;
+    localStorage.setItem('students', JSON.stringify(students));
+  }
+
   const student = students.find(s => s.codeA === codeA && s.codeB === codeB);
   if(!student) return 'الكود غير صحيح';
   if(!student.active) return 'الكود معطل';
@@ -66,6 +72,7 @@ document.getElementById('loginBtn').onclick = ()=>{
     const codeB = document.getElementById('studentCodeB').value.trim();
     const err = loginStudent(codeA, codeB);
     if(err) document.getElementById('loginMsg').innerText = err;
+    else document.getElementById('loginMsg').innerText = '';
   } else {
     const username = document.getElementById('teacherUsername').value.trim();
     const password = document.getElementById('teacherPassword').value.trim();
@@ -73,6 +80,7 @@ document.getElementById('loginBtn').onclick = ()=>{
       showSection('teacherPanel');
       renderStudents();
       renderLessonsTeacher();
+      document.getElementById('loginMsg').innerText = '';
     } else {
       document.getElementById('loginMsg').innerText='اسم المستخدم أو كلمة المرور غير صحيحة';
     }
