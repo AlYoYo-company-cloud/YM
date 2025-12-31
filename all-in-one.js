@@ -101,18 +101,24 @@ function renderLessons(){
   const list = document.getElementById('lessonsList');
   list.innerHTML = '';
 
-  lessons.forEach(l=>{
+  lessons.forEach((l, index)=>{
     const btn = document.createElement('button');
     btn.className = 'lessonBtn';
     btn.innerText = l.title;
-    btn.onclick = ()=>{
-      const v = document.getElementById('lessonVideo');
-      v.innerHTML = `<iframe src="${l.yt}" allowfullscreen></iframe>`;
-      v.classList.remove('hidden');
-    };
+    btn.dataset.index = index; // إضافة index
     list.appendChild(btn);
   });
 }
+
+/* ---------- Show Video with Event Delegation ---------- */
+document.getElementById('lessonsList').addEventListener('click', function(e){
+  if(e.target && e.target.classList.contains('lessonBtn')){
+    const idx = e.target.dataset.index;
+    const v = document.getElementById('lessonVideo');
+    v.innerHTML = `<iframe src="${lessons[idx].yt}" allowfullscreen></iframe>`;
+    v.classList.remove('hidden');
+  }
+});
 
 /* ---------- Leaderboard ---------- */
 function renderLeaderboard(){
@@ -169,6 +175,30 @@ window.deleteLesson = function(i){
   lessons.splice(i,1);
   localStorage.setItem('lessons', JSON.stringify(lessons));
   renderLessonsTeacher();
+};
+
+/* ---------- Add Student ---------- */
+document.getElementById('addStudentBtn').onclick = ()=>{
+  const name = document.getElementById('newStudentName').value.trim();
+  if(!name) return alert('ادخل اسم الطالب');
+  const codeA = Math.random().toString(36).substring(2,6).toUpperCase();
+  const codeB = Math.random().toString(36).substring(2,6).toUpperCase();
+  students.push({name, codeA, codeB, active:true});
+  localStorage.setItem('students', JSON.stringify(students));
+  renderStudents();
+  document.getElementById('newStudentName').value = '';
+};
+
+/* ---------- Add Lesson ---------- */
+document.getElementById('addLessonBtn').onclick = ()=>{
+  const title = document.getElementById('lessonTitle').value.trim();
+  const yt = document.getElementById('lessonYouTube').value.trim();
+  if(!title || !yt) return alert('ادخل العنوان ورابط الفيديو');
+  lessons.push({title, yt});
+  localStorage.setItem('lessons', JSON.stringify(lessons));
+  renderLessonsTeacher();
+  document.getElementById('lessonTitle').value = '';
+  document.getElementById('lessonYouTube').value = '';
 };
 
 });
