@@ -1,4 +1,9 @@
-// ---------- بيانات الطلاب والمدرس ----------
+// تنظيف LocalStorage القديم لمرة واحدة
+if(!localStorage.getItem('students')) {
+  localStorage.removeItem('students');
+  localStorage.removeItem('currentStudent');
+  localStorage.removeItem('lessons');
+}// ---------- بيانات الطلاب والمدرس ----------
 let students = JSON.parse(localStorage.getItem('students')) || [
   {name:"يحيى حسين أحمد", codeA:"YHA1", codeB:"YHA2", active:true},
   {name:"زياد ايهاب جمال", codeA:"ZIG1", codeB:"ZIG2", active:true},
