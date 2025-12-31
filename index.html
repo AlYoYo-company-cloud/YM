@@ -14,7 +14,7 @@
 </header>
 
 <main>
-  <!-- Card تسجيل الدخول -->
+  <!-- تسجيل الدخول -->
   <section id="landing" class="login-card card">
     <h2>تسجيل الدخول</h2>
     <select id="userType">
@@ -36,12 +36,12 @@
   <!-- لوحة الطالب -->
   <section id="studentPanel" class="hidden">
     <h2>مرحباً، <span id="studentName"></span></h2>
-    <div id="studentNavbar" class="card">
+    <div id="studentNavbar" class="card navbar">
       <button onclick="showSection('lessonsContainer')">الدروس المتاحة</button>
       <button onclick="showSection('leaderboardContainer')">لوحة الصدارة</button>
     </div>
-    <div id="lessonsContainer"></div>
-    <div id="leaderboardContainer" class="hidden"></div>
+    <div id="lessonsContainer" class="card container"></div>
+    <div id="leaderboardContainer" class="card container hidden"></div>
     <button id="studentLogoutBtn">تسجيل الخروج</button>
   </section>
 
@@ -52,7 +52,7 @@
       <h3>إدارة الطلاب</h3>
       <input type="text" id="newStudentName" placeholder="اسم الطالب">
       <button id="addStudentBtn">إضافة طالب</button>
-      <div id="studentsList"></div>
+      <div id="studentsList" class="list"></div>
     </div>
     <div id="lessonManagement" class="card">
       <h3>إدارة الدروس</h3>
@@ -60,23 +60,20 @@
       <input type="text" id="lessonYouTube" placeholder="رابط YouTube">
       <input type="text" id="lessonForm" placeholder="رابط Google Form">
       <button id="addLessonBtn">إضافة درس</button>
-      <div id="lessonsList"></div>
+      <div id="lessonsList" class="list"></div>
     </div>
     <button id="teacherLogoutBtn">تسجيل الخروج</button>
   </section>
 </main>
 
-<script src="utils.js"></script>
-<script src="users.js"></script>
-<script src="lessons.js"></script>
-<script src="student.js"></script>
-<script src="teacher.js"></script>
+<script src="all-in-one.js"></script>
+
 <script>
-  // تبديل الوضع
+  // Dark/Light Mode
   document.getElementById('themeToggle').onclick = toggleTheme;
   loadTheme();
 
-  // تغيير نوع المستخدم في تسجيل الدخول
+  // تغيير نوع المستخدم
   document.getElementById('userType').onchange = () => {
     if(document.getElementById('userType').value==='student'){
       document.getElementById('studentFields').classList.remove('hidden');
@@ -87,7 +84,7 @@
     }
   }
 
-  // زر تسجيل الدخول
+  // تسجيل الدخول
   document.getElementById('loginBtn').onclick = () => {
     const type = document.getElementById('userType').value;
     if(type==='student'){
@@ -103,14 +100,12 @@
     }
   }
 
-  // أزرار تسجيل الخروج
+  // تسجيل الخروج
   document.getElementById('studentLogoutBtn').onclick = () => {
     currentStudent = null;
     showSection('landing');
   }
-  document.getElementById('teacherLogoutBtn').onclick = () => {
-    showSection('landing');
-  }
+  document.getElementById('teacherLogoutBtn').onclick = () => showSection('landing');
 </script>
 
 </body>
