@@ -6,6 +6,7 @@ body {
   transition: 0.3s;
 }
 
+/* ---------- Themes ---------- */
 body.dark {
   background: #0a0a0a;
   color: #0fef6e;
@@ -16,6 +17,7 @@ body.light {
   color: #2563eb;
 }
 
+/* ---------- Header ---------- */
 header {
   display: flex;
   justify-content: space-between;
@@ -30,6 +32,7 @@ header {
   font-size: 1.8em;
 }
 
+/* ---------- Buttons ---------- */
 button {
   padding: 8px 16px;
   border: none;
@@ -46,6 +49,7 @@ button:hover {
   transform: translateY(-2px);
 }
 
+/* ---------- Inputs ---------- */
 input, select {
   padding: 8px;
   border-radius: 6px;
@@ -55,6 +59,7 @@ input, select {
   font-size: 1em;
 }
 
+/* ---------- Cards ---------- */
 .card {
   padding: 20px;
   margin: 15px 0;
@@ -74,6 +79,7 @@ body.light .card {
   transform: scale(1.03);
 }
 
+/* ---------- Login ---------- */
 .login-card {
   max-width: 380px;
   margin: 60px auto;
@@ -84,6 +90,28 @@ body.light .card {
 
 body.light .login-card {
   background: rgba(255,255,255,0.9);
+}
+
+/* ---------- Lessons ---------- */
+#lessonsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lessonBtn {
+  width: 100%;
+  padding: 14px;
+  font-size: 1em;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0fef6e, #00c853);
+  color: #000;
+  font-weight: 700;
+}
+
+.lessonBtn:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
 }
 
 .lesson-card {
@@ -97,15 +125,7 @@ body.light .lesson-card {
   background: rgba(230,240,255,0.8);
 }
 
-.lesson-card h4 {
-  margin: 0 0 10px 0;
-  font-size: 1.2em;
-}
-
-.lesson-card button {
-  margin-right: 10px;
-}
-
+/* ---------- Video ---------- */
 iframe {
   width: 100%;
   height: 320px;
@@ -119,6 +139,7 @@ iframe {
   width: 100%;
 }
 
+/* ---------- Navbar ---------- */
 .navbar {
   display: flex;
   gap: 10px;
@@ -130,10 +151,7 @@ iframe {
   font-size: 0.95em;
 }
 
-.hidden {
-  display: none;
-}
-
+/* ---------- Lists ---------- */
 .list div {
   padding: 10px;
   border-bottom: 1px solid #333;
@@ -143,16 +161,23 @@ body.light .list div {
   border-color: #ddd;
 }
 
+/* ---------- Utilities ---------- */
+.hidden {
+  display: none;
+}
+
 .error {
   color: #ff4d4d;
   font-weight: 600;
 }
 
+/* ---------- Responsive ---------- */
 @media(max-width:768px){
   header, main {
     padding: 10px;
   }
+
   iframe {
     height: 200px;
   }
-                   }
+}
