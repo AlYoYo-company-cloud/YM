@@ -1,5 +1,5 @@
 // ---------- بيانات الطلاب والمدرس ----------
-let students = [
+let students = JSON.parse(localStorage.getItem('students')) || [
   {name:"يحيى حسين أحمد", codeA:"YHA1", codeB:"YHA2", activeA:true, activeB:true},
   {name:"زياد ايهاب جمال", codeA:"ZIG1", codeB:"ZIG2", activeA:true, activeB:true},
   {name:"محمد محمد هاشم", codeA:"MMH1", codeB:"MMH2", activeA:true, activeB:true},
@@ -7,13 +7,8 @@ let students = [
 ];
 
 let teacher = {username:"admin", password:"1234", codeA:"TCH1", codeB:"TCH2"};
-
-// حفظ واسترجاع من LocalStorage
-if(!localStorage.getItem('students')) localStorage.setItem('students', JSON.stringify(students));
-if(!localStorage.getItem('lessons')) localStorage.setItem('lessons', JSON.stringify([]));
-students = JSON.parse(localStorage.getItem('students'));
-let lessons = JSON.parse(localStorage.getItem('lessons')||'[]');
-let currentStudent = null;
+let lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+let currentStudent = JSON.parse(localStorage.getItem('currentStudent')) || null;
 
 // ---------- Dark/Light Mode ----------
 function toggleTheme(){
@@ -41,23 +36,30 @@ function showSection(sectionId){
 }
 
 // ---------- Student Login ----------
+function loginStudent(codeA, codeB){
+  const student = students.find(s => s.codeA === codeA && s.codeB === codeB);
+  if(!student) return 'الكود غير صحيح';
+  if(!student.activeA || !student.activeB) return 'الكود معطل';
+  currentStudent = student;
+  localStorage.setItem('currentStudent', JSON.stringify(currentStudent));
+  document.getElementById('studentName').innerText = student.name;
+  showSection('studentPanel');
+  renderLessons();
+  renderLeaderboard();
+  return null;
+}
+
 document.getElementById('loginBtn').onclick = ()=>{
   const type = document.getElementById('userType').value;
   if(type==='student'){
     const codeA = document.getElementById('studentCodeA').value.trim();
     const codeB = document.getElementById('studentCodeB').value.trim();
-    const student = students.find(s=>s.codeA===codeA && s.codeB===codeB);
-    if(!student) {document.getElementById('loginMsg').innerText='الكود غير صحيح'; return;}
-    if(!student.activeA || !student.activeB){document.getElementById('loginMsg').innerText='الكود معطل'; return;}
-    currentStudent = student;
-    document.getElementById('studentName').innerText = student.name;
-    showSection('studentPanel');
-    renderLessons();
-    renderLeaderboard();
+    const err = loginStudent(codeA, codeB);
+    if(err) document.getElementById('loginMsg').innerText = err;
   } else {
-    const username=document.getElementById('teacherUsername').value.trim();
-    const password=document.getElementById('teacherPassword').value.trim();
-    if(username===teacher.username && password===teacher.password){
+    const username = document.getElementById('teacherUsername').value.trim();
+    const password = document.getElementById('teacherPassword').value.trim();
+    if(username === teacher.username && password === teacher.password){
       showSection('teacherPanel');
       renderStudents();
       renderLessonsTeacher();
@@ -70,9 +72,20 @@ document.getElementById('loginBtn').onclick = ()=>{
 // ---------- Logout ----------
 document.getElementById('studentLogoutBtn').onclick = ()=>{
   currentStudent=null;
+  localStorage.removeItem('currentStudent');
   showSection('landing');
 }
 document.getElementById('teacherLogoutBtn').onclick = ()=>showSection('landing');
+
+// ---------- Auto-login if session exists ----------
+window.addEventListener('load', ()=>{
+  if(currentStudent){
+    document.getElementById('studentName').innerText = currentStudent.name;
+    showSection('studentPanel');
+    renderLessons();
+    renderLeaderboard();
+  }
+});
 
 // ---------- Teacher Functions ----------
 function generateCode(){
@@ -170,13 +183,23 @@ function attachLessonEvents(){
   });
 }
 
-// ---------- Leaderboard (example) ----------
+// ---------- Leaderboard ----------
 function renderLeaderboard(){
   const container=document.getElementById('leaderboardContainer');
   container.innerHTML='';
-  students.sort((a,b)=>b.id - a.id).forEach((s,i)=>{
+  students.forEach((s,i)=>{
     const div=document.createElement('div');
     div.innerText=`${i+1}. ${s.name}`;
     container.appendChild(div);
   });
 }
+
+// ---------- Buttons to toggle student panels ----------
+document.getElementById('showLessonsBtn').onclick = ()=>{
+  document.getElementById('lessonsContainer').classList.remove('hidden');
+  document.getElementById('leaderboardContainer').classList.add('hidden');
+};
+document.getElementById('showLeaderboardBtn').onclick = ()=>{
+  document.getElementById('leaderboardContainer').classList.remove('hidden');
+  document.getElementById('lessonsContainer').classList.add('hidden');
+};
