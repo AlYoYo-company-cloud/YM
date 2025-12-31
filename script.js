@@ -1,111 +1,63 @@
-// بيانات تجريبية
-let store = {
-  students:[
-    {name:'يحيى حسين أحمد', codeA:'ABC123', codeB:'XYZ789', active:true, progress:{}},
-    {name:'زياد ايهاب جمال', codeA:'DEF456', codeB:'UVW987', active:true, progress:{}},
-    {name:'محمد علاء العبودي', codeA:'GHI789', codeB:'RST654', active:true, progress:{}}
-  ],
-  lessons:[
-    {id:1, title:'مقدمة في الخلية', youtube:'https://www.youtube.com/embed/0z6U3kVQ3aU', form:'https://docs.google.com/forms/d/e/1FAIpQLSe-example-form/viewform?usp=sf_link'}
-  ],
-  teacher:{username:'yahia', password:'123456'}
-};
+/* ======================================== all-in-one.js
 
-let currentStudent=null;
+يحتوي على كل وظائف المنصة في ملف واحد
 
-// Theme toggle
-document.getElementById('themeToggle').onclick = ()=>{
-  document.body.className=document.body.className==='dark'?'light':'dark';
-};
+يشمل:
 
-// Student login
-document.getElementById('studentLoginBtn').onclick = ()=>{
-  const codeA=document.getElementById('studentCodeA').value;
-  const codeB=document.getElementById('studentCodeB').value;
-  const student=store.students.find(s=>s.codeA===codeA && s.codeB===codeB);
-  if(!student){document.getElementById('studentMsg').innerText='كود غير صحيح';return;}
-  if(!student.active){document.getElementById('studentMsg').innerText='الحساب غير مفعل';return;}
-  currentStudent=student;
-  document.getElementById('landing').classList.add('hidden');
-  document.getElementById('studentPanel').classList.remove('hidden');
-  document.getElementById('studentName').innerText=student.name;
-  renderStudentPanel();
-};
+users.js: بيانات الطلاب والمدرس + LocalStorage
 
-// Teacher login
-document.getElementById('teacherLoginBtn').onclick = ()=>{
-  const u=document.getElementById('teacherUsername').value;
-  const p=document.getElementById('teacherPassword').value;
-  if(u===store.teacher.username && p===store.teacher.password){
-    document.getElementById('landing').classList.add('hidden');
-    document.getElementById('teacherPanel').classList.remove('hidden');
-    renderTeacherPanel();
-  }else{document.getElementById('teacherMsg').innerText='بيانات غير صحيحة';}
-};
+lessons.js: بيانات الدروس وإدارتها
 
-// Logout buttons
-document.getElementById('studentLogoutBtn').onclick = ()=>{
-  currentStudent=null;
-  document.getElementById('studentPanel').classList.add('hidden');
-  document.getElementById('landing').classList.remove('hidden');
-};
-document.getElementById('teacherLogoutBtn').onclick = ()=>{
-  document.getElementById('teacherPanel').classList.add('hidden');
-  document.getElementById('landing').classList.remove('hidden');
-};
+utils.js: وظائف مساعدة (تبديل الوضع، عرض/إخفاء الأقسام، توليد الأكواد)
 
-// Render functions
-function renderStudentPanel(){
-  const container=document.getElementById('lessonsContainer');
-  container.innerHTML='';
-  store.lessons.forEach(l=>{
-    const card=document.createElement('div');
-    card.className='card';
-    card.innerHTML=`<h4>${l.title}</h4><iframe src="${l.youtube}"></iframe><button onclick='window.open("${l.form}")'>حل الكويز</button>`;
-    container.appendChild(card);
-  });
-  // لوحة الصدارة ممكن نضيف لاحقاً مع Progress
-}
+student.js: وظائف الطلاب (تسجيل الدخول، عرض الدروس، لوحة الصدارة)
 
-function renderTeacherPanel(){
-  // Students list
-  const studentsList=document.getElementById('studentsList');
-  studentsList.innerHTML='';
-  store.students.forEach((s,i)=>{
-    const div=document.createElement('div');
-    div.innerHTML=`${s.name} - ${s.active?'نشط':'غير نشط'} <button onclick='toggleStudent(${i})'>تبديل التفعيل</button> <button onclick='resetProgress(${i})'>إعادة التقدم</button>`;
-    studentsList.appendChild(div);
-  });
-  // Lessons list
-  const lessonsList=document.getElementById('lessonsList');
-  lessonsList.innerHTML='';
-  store.lessons.forEach(l=>{
-    const div=document.createElement('div');
-    div.innerText=l.title;
-    lessonsList.appendChild(div);
-  });
-}
+teacher.js: وظائف المدرس (تسجيل الدخول، إدارة الطلاب والدروس) ======================================== */
 
-// Teacher functions
-window.toggleStudent=(i)=>{store.students[i].active=!store.students[i].active; renderTeacherPanel();}
-window.resetProgress=(i)=>{store.students[i].progress={}; alert('تم إعادة التقدم');}
 
-// Add student
-document.getElementById('addStudentBtn').onclick = ()=>{
-  const name=document.getElementById('newStudentName').value;
-  if(!name){alert('أدخل اسم الطالب');return;}
-  store.students.push({name, codeA:Math.random().toString(36).slice(2,8).toUpperCase(), codeB:Math.random().toString(36).slice(2,8).toUpperCase(), active:true, progress:{}});
-  document.getElementById('newStudentName').value='';
-  renderTeacherPanel();
-}
 
-// Add lesson
-document.getElementById('addLessonBtn').onclick = ()=>{
-  const title=document.getElementById('lessonTitle').value;
-  const youtube=document.getElementById('lessonYouTube').value;
-  const form=document.getElementById('lessonForm').value;
-  if(!title || !youtube || !form){alert('أكمل كل الحقول');return;}
-  store.lessons.push({id:store.lessons.length+1,title,youtube,form});
-  document.getElementById('lessonTitle').value=''; document.getElementById('lessonYouTube').value=''; document.getElementById('lessonForm').value='';
-  renderTeacherPanel();
-    }
+// ====================== users.js ====================== let students = [ { name: 'يحيى حسين أحمد', codeA: 'ABC123', codeB: 'XYZ789', active: true, progress: {} }, { name: 'زياد ايهاب جمال', codeA: 'DEF456', codeB: 'UVW987', active: true, progress: {} }, { name: 'محمد علاء العبودي', codeA: 'GHI789', codeB: 'RST654', active: true, progress: {} } ];
+
+let teacher = { username: 'yahia', password: '123456' };
+
+function saveToStorage() { localStorage.setItem('students', JSON.stringify(students)); localStorage.setItem('teacher', JSON.stringify(teacher)); }
+
+function loadFromStorage() { const s = localStorage.getItem('students'); const t = localStorage.getItem('teacher'); if (s) students = JSON.parse(s); if (t) teacher = JSON.parse(t); } loadFromStorage();
+
+// ====================== lessons.js ====================== let lessons = [ { id: 1, title: 'مقدمة في الخلية', youtube: 'https://www.youtube.com/embed/0z6U3kVQ3aU', form: 'https://docs.google.com/forms/d/e/1FAIpQLSe-example-form/viewform?usp=sf_link' }, { id: 2, title: 'الحمض النووي DNA', youtube: 'https://www.youtube.com/embed/example2', form: 'https://docs.google.com/forms/d/e/1FAIpQLSe-example2/viewform?usp=sf_link' } ];
+
+function addLesson(title, youtube, form) { lessons.push({ id: lessons.length + 1, title, youtube, form }); }
+
+function getLessonById(id) { return lessons.find(l => l.id === id); }
+
+// ====================== utils.js ====================== function toggleTheme() { document.body.classList.toggle('dark'); document.body.classList.toggle('light'); localStorage.setItem('theme', document.body.className); }
+
+function loadTheme() { const mode = localStorage.getItem('theme') || 'dark'; document.body.className = mode; }
+
+function showSection(sectionId) { document.querySelectorAll('main section').forEach(s => s.classList.add('hidden')); document.getElementById(sectionId).classList.remove('hidden'); }
+
+function generateCode() { return Math.random().toString(36).slice(2,8).toUpperCase(); }
+
+// ====================== student.js ====================== let currentStudent = null;
+
+function studentLogin(codeA, codeB) { const student = students.find(s => s.codeA === codeA && s.codeB === codeB); if (!student) return { error: 'كود غير صحيح' }; if (!student.active) return { error: 'الحساب غير مفعل' }; currentStudent = student; showSection('studentPanel'); document.getElementById('studentName').innerText = student.name; renderLessons(); renderLeaderboard(); return { success: true }; }
+
+function renderLessons() { const container = document.getElementById('lessonsContainer'); container.innerHTML = ''; lessons.forEach(l => { const card = document.createElement('div'); card.className = 'card lesson-card'; card.innerHTML = <h4>${l.title}</h4> <button onclick="openLesson('${l.youtube}')">مشاهدة الفيديو</button> <button onclick="window.open('${l.form}', '_blank')">حل الكويز</button>; container.appendChild(card); }); }
+
+function openLesson(url) { const container = document.getElementById('lessonsContainer'); container.innerHTML = <button onclick="renderLessons()">العودة للقائمة</button><iframe src="${url}" allowfullscreen></iframe>; }
+
+function renderLeaderboard() { const container = document.getElementById('leaderboardContainer'); container.innerHTML = '<h3>لوحة الصدارة</h3>'; }
+
+// ====================== teacher.js ====================== function teacherLogin(username, password) { if (username === teacher.username && password === teacher.password) { showSection('teacherPanel'); renderStudents(); renderTeacherLessons(); return { success: true }; } else return { error: 'بيانات غير صحيحة' }; }
+
+function addStudent(name) { const newStudent = { name, codeA: generateCode(), codeB: generateCode(), active: true, progress: {} }; students.push(newStudent); saveToStorage(); renderStudents(); }
+
+function toggleStudent(index) { students[index].active = !students[index].active; saveToStorage(); renderStudents(); }
+
+function resetProgress(index) { students[index].progress = {}; saveToStorage(); alert('تم إعادة التقدم'); }
+
+function renderStudents() { const list = document.getElementById('studentsList'); list.innerHTML = ''; students.forEach((s,i) => { const div = document.createElement('div'); div.innerHTML = ${s.name} - ${s.active ? 'نشط' : 'غير نشط'} <button onclick="toggleStudent(${i})">تبديل التفعيل</button> <button onclick="resetProgress(${i})">إعادة التقدم</button>; list.appendChild(div); }); }
+
+function renderTeacherLessons() { const list = document.getElementById('lessonsList'); list.innerHTML = ''; lessons.forEach(l => { const div = document.createElement('div'); div.innerText = l.title; list.appendChild(div); }); }
+
+function addTeacherLesson(title, youtube, form) { addLesson(title, youtube, form); renderTeacherLessons(); }
