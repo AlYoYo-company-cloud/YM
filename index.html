@@ -22,7 +22,8 @@
       <option value="teacher">مدرس</option>
     </select>
     <div id="studentFields">
-      <input type="text" id="studentCode" placeholder="أدخل الكود المميز">
+      <input type="text" id="studentCodeA" placeholder="الكود المميز A">
+      <input type="text" id="studentCodeB" placeholder="الكود المميز B">
     </div>
     <div id="teacherFields" class="hidden">
       <input type="text" id="teacherUsername" placeholder="اسم المستخدم">
@@ -35,24 +36,15 @@
   <!-- لوحة الطالب -->
   <section id="studentPanel" class="hidden">
     <h2>مرحباً، <span id="studentName"></span></h2>
-
     <div id="studentNavbar" class="card navbar">
       <button id="showLessonsBtn">الدروس المتاحة</button>
       <button id="showLeaderboardBtn">لوحة الصدارة</button>
     </div>
-
-    <div id="lessonsContainer" class="card container hidden">
-      <div id="lessonsList">
-        <!-- أزرار الحصص جاهزة -->
-        <button class="lessonBtn" data-src="https://www.youtube.com/embed/P_-OHiOmftg">حل على الدعامة في الانسان</button>
-        <button class="lessonBtn" data-src="https://www.youtube.com/embed/VNZ1ivdGhgE">كورس التأسيس لتالته ثانوي</button>
-        <button class="lessonBtn" data-src="https://www.youtube.com/embed/ocYoCZesMmA">الدعامة في النبات</button>
-      </div>
+    <div id="lessonsContainer" class="card container">
+      <div id="lessonsList"></div>
       <div id="lessonVideo" class="video-container hidden"></div>
     </div>
-
     <div id="leaderboardContainer" class="card container hidden"></div>
-
     <button id="studentLogoutBtn">تسجيل الخروج</button>
   </section>
 
@@ -71,7 +63,6 @@
       <h3>إدارة الدروس</h3>
       <input type="text" id="lessonTitle" placeholder="عنوان الدرس">
       <input type="text" id="lessonYouTube" placeholder="رابط YouTube (embed)">
-      <input type="text" id="lessonForm" placeholder="رابط Google Form">
       <button id="addLessonBtn">إضافة درس</button>
       <div id="lessonsListTeacher" class="list"></div>
     </div>
@@ -82,4 +73,4 @@
 
 <script src="all-in-one.js"></script>
 </body>
-  </html>
+      </html>
