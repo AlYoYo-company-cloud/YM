@@ -7,51 +7,54 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark">
+
 <header>
   <div class="logo">منصة يحيى محمد</div>
-  <nav id="navbar">
-    <!-- ديناميكي حسب نوع المستخدم -->
-  </nav>
   <button id="themeToggle">تبديل الوضع</button>
 </header>
 
 <main>
-  <!-- Landing page: تسجيل دخول الطالب والمدرس -->
-  <section id="landing">
-    <h2>تسجيل دخول الطالب</h2>
-    <input type="text" id="studentCodeA" placeholder="الكود A">
-    <input type="text" id="studentCodeB" placeholder="الكود B">
-    <button id="studentLoginBtn">دخول</button>
-    <p id="studentMsg" class="error"></p>
-
-    <hr>
-    <h2>تسجيل دخول المدرس</h2>
-    <input type="text" id="teacherUsername" placeholder="اسم المستخدم">
-    <input type="password" id="teacherPassword" placeholder="كلمة المرور">
-    <button id="teacherLoginBtn">دخول</button>
-    <p id="teacherMsg" class="error"></p>
+  <!-- Card تسجيل الدخول -->
+  <section id="landing" class="login-card card">
+    <h2>تسجيل الدخول</h2>
+    <select id="userType">
+      <option value="student">طالب</option>
+      <option value="teacher">مدرس</option>
+    </select>
+    <div id="studentFields">
+      <input type="text" id="studentCodeA" placeholder="الكود A">
+      <input type="text" id="studentCodeB" placeholder="الكود B">
+    </div>
+    <div id="teacherFields" class="hidden">
+      <input type="text" id="teacherUsername" placeholder="اسم المستخدم">
+      <input type="password" id="teacherPassword" placeholder="كلمة المرور">
+    </div>
+    <button id="loginBtn">دخول</button>
+    <p id="loginMsg" class="error"></p>
   </section>
 
-  <!-- Student Panel -->
+  <!-- لوحة الطالب -->
   <section id="studentPanel" class="hidden">
     <h2>مرحباً، <span id="studentName"></span></h2>
-    <div id="studentNavbar"></div>
+    <div id="studentNavbar" class="card">
+      <button onclick="showSection('lessonsContainer')">الدروس المتاحة</button>
+      <button onclick="showSection('leaderboardContainer')">لوحة الصدارة</button>
+    </div>
     <div id="lessonsContainer"></div>
-    <div id="leaderboardContainer"></div>
+    <div id="leaderboardContainer" class="hidden"></div>
     <button id="studentLogoutBtn">تسجيل الخروج</button>
   </section>
 
-  <!-- Teacher Panel -->
+  <!-- لوحة المدرس -->
   <section id="teacherPanel" class="hidden">
     <h2>لوحة المدرس</h2>
-    <div id="teacherNavbar"></div>
-    <div id="studentManagement">
+    <div id="studentManagement" class="card">
       <h3>إدارة الطلاب</h3>
       <input type="text" id="newStudentName" placeholder="اسم الطالب">
       <button id="addStudentBtn">إضافة طالب</button>
       <div id="studentsList"></div>
     </div>
-    <div id="lessonManagement">
+    <div id="lessonManagement" class="card">
       <h3>إدارة الدروس</h3>
       <input type="text" id="lessonTitle" placeholder="عنوان الدرس">
       <input type="text" id="lessonYouTube" placeholder="رابط YouTube">
@@ -63,6 +66,52 @@
   </section>
 </main>
 
-<script src="script.js"></script>
+<script src="utils.js"></script>
+<script src="users.js"></script>
+<script src="lessons.js"></script>
+<script src="student.js"></script>
+<script src="teacher.js"></script>
+<script>
+  // تبديل الوضع
+  document.getElementById('themeToggle').onclick = toggleTheme;
+  loadTheme();
+
+  // تغيير نوع المستخدم في تسجيل الدخول
+  document.getElementById('userType').onchange = () => {
+    if(document.getElementById('userType').value==='student'){
+      document.getElementById('studentFields').classList.remove('hidden');
+      document.getElementById('teacherFields').classList.add('hidden');
+    } else {
+      document.getElementById('studentFields').classList.add('hidden');
+      document.getElementById('teacherFields').classList.remove('hidden');
+    }
+  }
+
+  // زر تسجيل الدخول
+  document.getElementById('loginBtn').onclick = () => {
+    const type = document.getElementById('userType').value;
+    if(type==='student'){
+      const codeA=document.getElementById('studentCodeA').value;
+      const codeB=document.getElementById('studentCodeB').value;
+      const result = studentLogin(codeA, codeB);
+      if(result.error) document.getElementById('loginMsg').innerText = result.error;
+    } else {
+      const username = document.getElementById('teacherUsername').value;
+      const password = document.getElementById('teacherPassword').value;
+      const result = teacherLogin(username,password);
+      if(result.error) document.getElementById('loginMsg').innerText = result.error;
+    }
+  }
+
+  // أزرار تسجيل الخروج
+  document.getElementById('studentLogoutBtn').onclick = () => {
+    currentStudent = null;
+    showSection('landing');
+  }
+  document.getElementById('teacherLogoutBtn').onclick = () => {
+    showSection('landing');
+  }
+</script>
+
 </body>
-      </html>
+        </html>
