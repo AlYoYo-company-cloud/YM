@@ -6,14 +6,8 @@ let defaultStudents = [
   {name:"عمر سعيد", codeA:"OS1", codeB:"OS2", active:true}
 ];
 
-// إعادة ضبط البيانات القديمة إذا كانت LocalStorage تحتوي على كود غير متوافق
-let storedStudents = JSON.parse(localStorage.getItem('students'));
-if(!storedStudents || !storedStudents[0].codeA || !storedStudents[0].codeB){
-  students = defaultStudents;
-  localStorage.setItem('students', JSON.stringify(students));
-} else {
-  students = storedStudents;
-}
+let students = JSON.parse(localStorage.getItem('students')) || defaultStudents;
+localStorage.setItem('students', JSON.stringify(students));
 
 let teacher = {username:"admin", password:"1234"};
 
@@ -24,6 +18,8 @@ let defaultLessons = [
 ];
 
 let lessons = JSON.parse(localStorage.getItem('lessons')) || defaultLessons;
+localStorage.setItem('lessons', JSON.stringify(lessons));
+
 let currentStudent = JSON.parse(localStorage.getItem('currentStudent')) || null;
 
 // ---------- Dark/Light Mode ----------
