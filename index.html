@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة يحيى محمد</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="dark">
+<header>
+  <div class="logo">منصة يحيى محمد</div>
+  <nav id="navbar">
+    <!-- ديناميكي حسب نوع المستخدم -->
+  </nav>
+  <button id="themeToggle">تبديل الوضع</button>
+</header>
+
+<main>
+  <!-- Landing page: تسجيل دخول الطالب والمدرس -->
+  <section id="landing">
+    <h2>تسجيل دخول الطالب</h2>
+    <input type="text" id="studentCodeA" placeholder="الكود A">
+    <input type="text" id="studentCodeB" placeholder="الكود B">
+    <button id="studentLoginBtn">دخول</button>
+    <p id="studentMsg" class="error"></p>
+
+    <hr>
+    <h2>تسجيل دخول المدرس</h2>
+    <input type="text" id="teacherUsername" placeholder="اسم المستخدم">
+    <input type="password" id="teacherPassword" placeholder="كلمة المرور">
+    <button id="teacherLoginBtn">دخول</button>
+    <p id="teacherMsg" class="error"></p>
+  </section>
+
+  <!-- Student Panel -->
+  <section id="studentPanel" class="hidden">
+    <h2>مرحباً، <span id="studentName"></span></h2>
+    <div id="studentNavbar"></div>
+    <div id="lessonsContainer"></div>
+    <div id="leaderboardContainer"></div>
+    <button id="studentLogoutBtn">تسجيل الخروج</button>
+  </section>
+
+  <!-- Teacher Panel -->
+  <section id="teacherPanel" class="hidden">
+    <h2>لوحة المدرس</h2>
+    <div id="teacherNavbar"></div>
+    <div id="studentManagement">
+      <h3>إدارة الطلاب</h3>
+      <input type="text" id="newStudentName" placeholder="اسم الطالب">
+      <button id="addStudentBtn">إضافة طالب</button>
+      <div id="studentsList"></div>
+    </div>
+    <div id="lessonManagement">
+      <h3>إدارة الدروس</h3>
+      <input type="text" id="lessonTitle" placeholder="عنوان الدرس">
+      <input type="text" id="lessonYouTube" placeholder="رابط YouTube">
+      <input type="text" id="lessonForm" placeholder="رابط Google Form">
+      <button id="addLessonBtn">إضافة درس</button>
+      <div id="lessonsList"></div>
+    </div>
+    <button id="teacherLogoutBtn">تسجيل الخروج</button>
+  </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+      </html>
