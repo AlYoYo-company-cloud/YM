@@ -1,9 +1,9 @@
 // ---------- بيانات الطلاب والمدرس ----------
 let students = JSON.parse(localStorage.getItem('students')) || [
-  {name:"يحيى حسين أحمد", code:"YHA1", active:true},
-  {name:"زياد ايهاب جمال", code:"ZIG1", active:true},
-  {name:"محمد محمد هاشم", code:"MMH1", active:true},
-  {name:"عمر سعيد", code:"OS1", active:true}
+  {name:"يحيى حسين أحمد", codeA:"YHA1", codeB:"YHA2", active:true},
+  {name:"زياد ايهاب جمال", codeA:"ZIG1", codeB:"ZIG2", active:true},
+  {name:"محمد محمد هاشم", codeA:"MMH1", codeB:"MMH2", active:true},
+  {name:"عمر سعيد", codeA:"OS1", codeB:"OS2", active:true}
 ];
 
 let teacher = {username:"admin", password:"1234"};
@@ -12,6 +12,7 @@ let lessons = JSON.parse(localStorage.getItem('lessons')) || [
   {title:"كورس التأسيس لتالته ثانوي", yt:"https://www.youtube.com/embed/VNZ1ivdGhgE"},
   {title:"الدعامة في النبات", yt:"https://www.youtube.com/embed/ocYoCZesMmA"}
 ];
+
 let currentStudent = JSON.parse(localStorage.getItem('currentStudent')) || null;
 
 // ---------- Dark/Light Mode ----------
@@ -40,8 +41,8 @@ function showSection(sectionId){
 }
 
 // ---------- Student Login ----------
-function loginStudent(code){
-  const student = students.find(s => s.code === code);
+function loginStudent(codeA, codeB){
+  const student = students.find(s => s.codeA === codeA && s.codeB === codeB);
   if(!student) return 'الكود غير صحيح';
   if(!student.active) return 'الكود معطل';
   currentStudent = student;
@@ -56,8 +57,9 @@ function loginStudent(code){
 document.getElementById('loginBtn').onclick = ()=>{
   const type = document.getElementById('userType').value;
   if(type==='student'){
-    const code = document.getElementById('studentCode').value.trim();
-    const err = loginStudent(code);
+    const codeA = document.getElementById('studentCodeA').value.trim();
+    const codeB = document.getElementById('studentCodeB').value.trim();
+    const err = loginStudent(codeA, codeB);
     if(err) document.getElementById('loginMsg').innerText = err;
   } else {
     const username = document.getElementById('teacherUsername').value.trim();
@@ -98,8 +100,9 @@ function generateCode(){
 document.getElementById('addStudentBtn').onclick = ()=>{
   const name=document.getElementById('newStudentName').value.trim();
   if(!name) return alert('ادخل اسم الطالب');
-  const code = generateCode();
-  students.push({name, code, active:true});
+  const codeA = generateCode();
+  const codeB = generateCode();
+  students.push({name, codeA, codeB, active:true});
   localStorage.setItem('students',JSON.stringify(students));
   renderStudents();
   document.getElementById('newStudentName').value='';
@@ -110,7 +113,7 @@ function renderStudents(){
   list.innerHTML='';
   students.forEach((s,i)=>{
     const div=document.createElement('div');
-    div.innerHTML=`${s.name} | الكود: ${s.code} | 
+    div.innerHTML=`${s.name} | الكود A: ${s.codeA} | الكود B: ${s.codeB} | 
     <button onclick="toggleStudent(${i})">${s.active?'إيقاف':'تفعيل'}</button>`;
     list.appendChild(div);
   });
