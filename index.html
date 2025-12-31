@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>منصة يحيى محمد</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة يحيى محمد</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark">
 
@@ -67,46 +67,5 @@
 </main>
 
 <script src="all-in-one.js"></script>
-
-<script>
-  // Dark/Light Mode
-  document.getElementById('themeToggle').onclick = toggleTheme;
-  loadTheme();
-
-  // تغيير نوع المستخدم
-  document.getElementById('userType').onchange = () => {
-    if(document.getElementById('userType').value==='student'){
-      document.getElementById('studentFields').classList.remove('hidden');
-      document.getElementById('teacherFields').classList.add('hidden');
-    } else {
-      document.getElementById('studentFields').classList.add('hidden');
-      document.getElementById('teacherFields').classList.remove('hidden');
-    }
-  }
-
-  // تسجيل الدخول
-  document.getElementById('loginBtn').onclick = () => {
-    const type = document.getElementById('userType').value;
-    if(type==='student'){
-      const codeA=document.getElementById('studentCodeA').value;
-      const codeB=document.getElementById('studentCodeB').value;
-      const result = studentLogin(codeA, codeB);
-      if(result.error) document.getElementById('loginMsg').innerText = result.error;
-    } else {
-      const username = document.getElementById('teacherUsername').value;
-      const password = document.getElementById('teacherPassword').value;
-      const result = teacherLogin(username,password);
-      if(result.error) document.getElementById('loginMsg').innerText = result.error;
-    }
-  }
-
-  // تسجيل الخروج
-  document.getElementById('studentLogoutBtn').onclick = () => {
-    currentStudent = null;
-    showSection('landing');
-  }
-  document.getElementById('teacherLogoutBtn').onclick = () => showSection('landing');
-</script>
-
 </body>
-        </html>
+      </html>
