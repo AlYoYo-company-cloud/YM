@@ -1,155 +1,161 @@
-document.addEventListener('DOMContentLoaded', () => {
-  let currentStudent = null;
-  let lessons = [];
-  let students = [];
+let students = JSON.parse(localStorage.getItem('students')||'[]');
+let lessons = JSON.parse(localStorage.getItem('lessons')||'[]');
+let currentStudent = null;
 
-  /* ===== Dark/Light Mode ===== */
-  const themeToggle = document.getElementById('themeToggle');
-  themeToggle?.addEventListener('click', toggleTheme);
-
-  function toggleTheme(){
-    document.body.classList.toggle('dark');
-    document.body.classList.toggle('light');
-    localStorage.setItem('theme', document.body.classList.contains('dark')?'dark':'light');
+// ---------- Dark/Light Mode ----------
+function toggleTheme(){
+  if(document.body.classList.contains('dark')){
+    document.body.classList.replace('dark','light');
+    localStorage.setItem('theme','light');
+  } else {
+    document.body.classList.replace('light','dark');
+    localStorage.setItem('theme','dark');
   }
+}
+function loadTheme(){
+  const theme = localStorage.getItem('theme') || 'dark';
+  document.body.className = theme;
+}
+document.getElementById('themeToggle').onclick = toggleTheme;
+loadTheme();
 
-  function loadTheme(){
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    document.body.classList.remove('dark','light');
-    document.body.classList.add(savedTheme);
-  }
-  loadTheme();
-
-  /* ===== User Type Toggle ===== */
-  const userType = document.getElementById('userType');
-  userType?.addEventListener('change',()=>{
-    if(userType.value==='student'){
-      document.getElementById('studentFields').classList.remove('hidden');
-      document.getElementById('teacherFields').classList.add('hidden');
-    } else {
-      document.getElementById('studentFields').classList.add('hidden');
-      document.getElementById('teacherFields').classList.remove('hidden');
-    }
+// ---------- Utility ----------
+function showSection(sectionId){
+  ['landing','studentPanel','teacherPanel'].forEach(id=>{
+    document.getElementById(id).classList.add('hidden');
   });
+  document.getElementById(sectionId).classList.remove('hidden');
+}
 
-  /* ===== Login ===== */
-  const loginBtn = document.getElementById('loginBtn');
-  loginBtn?.addEventListener('click',()=>{
-    const type = userType.value;
-    if(type==='student'){
-      const codeA = document.getElementById('studentCodeA').value;
-      const codeB = document.getElementById('studentCodeB').value;
-      const result = studentLogin(codeA, codeB);
-      document.getElementById('loginMsg').innerText = result.error || '';
-    } else {
-      const username = document.getElementById('teacherUsername').value;
-      const password = document.getElementById('teacherPassword').value;
-      const result = teacherLogin(username,password);
-      document.getElementById('loginMsg').innerText = result.error || '';
-    }
-  });
-
-  function studentLogin(codeA, codeB){
-    if(codeA && codeB){
-      currentStudent = {name:'طالب مثال'};
-      document.getElementById('studentName').innerText = currentStudent.name;
-      showSection('studentPanel');
-      renderLessons();
-      return {};
-    }
-    return {error:'الرجاء إدخال الكودين'};
-  }
-
-  function teacherLogin(username,password){
+// ---------- Student Login ----------
+document.getElementById('loginBtn').onclick = ()=>{
+  const type = document.getElementById('userType').value;
+  if(type==='student'){
+    const code = document.getElementById('studentCode').value.trim();
+    const student = students.find(s=>s.code===code);
+    if(!student) {document.getElementById('loginMsg').innerText='الكود غير صحيح'; return;}
+    if(!student.active){document.getElementById('loginMsg').innerText='الكود معطل'; return;}
+    currentStudent = student;
+    document.getElementById('studentName').innerText = student.name;
+    showSection('studentPanel');
+    renderLessons();
+    renderLeaderboard();
+  } else {
+    const username=document.getElementById('teacherUsername').value.trim();
+    const password=document.getElementById('teacherPassword').value.trim();
     if(username==='admin' && password==='1234'){
       showSection('teacherPanel');
       renderStudents();
       renderLessonsTeacher();
-      return {};
+    } else {
+      document.getElementById('loginMsg').innerText='اسم المستخدم أو كلمة المرور غير صحيحة';
     }
-    return {error:'اسم المستخدم أو كلمة المرور غير صحيحة'};
   }
+}
 
-  /* ===== Show Sections ===== */
-  function showSection(sectionId){
-    ['landing','studentPanel','teacherPanel'].forEach(id=>{
-      document.getElementById(id).classList.add('hidden');
-    });
-    document.getElementById(sectionId).classList.remove('hidden');
-  }
+// ---------- Logout ----------
+document.getElementById('studentLogoutBtn').onclick = ()=>{
+  currentStudent=null;
+  showSection('landing');
+}
+document.getElementById('teacherLogoutBtn').onclick = ()=>showSection('landing');
 
-  /* ===== Logout ===== */
-  document.getElementById('studentLogoutBtn')?.addEventListener('click',()=>{
-    currentStudent=null;
-    showSection('landing');
+// ---------- Teacher Functions ----------
+function generateCode(){
+  const partA=Math.random().toString(36).substring(2,6).toUpperCase();
+  const partB=Math.random().toString(36).substring(2,6).toUpperCase();
+  return `${partA}-${partB}`;
+}
+
+document.getElementById('addStudentBtn').onclick = ()=>{
+  const name=document.getElementById('newStudentName').value.trim();
+  if(!name) return alert('ادخل اسم الطالب');
+  const code=generateCode();
+  students.push({id:Date.now(), name, code, active:true});
+  localStorage.setItem('students',JSON.stringify(students));
+  renderStudents();
+  document.getElementById('newStudentName').value='';
+}
+
+function renderStudents(){
+  const list=document.getElementById('studentsList');
+  list.innerHTML='';
+  students.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.innerHTML=`${s.name} | الكود: ${s.code} | <button onclick="toggleStudent(${i})">${s.active?'إيقاف':'تفعيل'}</button>`;
+    list.appendChild(div);
   });
-  document.getElementById('teacherLogoutBtn')?.addEventListener('click',()=>showSection('landing'));
+}
 
-  /* ===== Student Search ===== */
-  document.getElementById('searchLesson')?.addEventListener('input', e=>{
-    const filter = e.target.value.toLowerCase();
-    document.querySelectorAll('#lessonsContainer .lesson-card').forEach(card=>{
-      card.style.display = card.querySelector('h4').innerText.toLowerCase().includes(filter)?'':'none';
-    });
+function toggleStudent(index){
+  students[index].active=!students[index].active;
+  localStorage.setItem('students',JSON.stringify(students));
+  renderStudents();
+}
+
+// ---------- Lessons ----------
+document.getElementById('addLessonBtn').onclick = ()=>{
+  const title=document.getElementById('lessonTitle').value.trim();
+  const yt=document.getElementById('lessonYouTube').value.trim();
+  const form=document.getElementById('lessonForm').value.trim();
+  if(!title || !yt) return alert('ادخل العنوان ورابط الفيديو');
+  lessons.push({title, yt, form});
+  localStorage.setItem('lessons',JSON.stringify(lessons));
+  renderLessonsTeacher();
+  document.getElementById('lessonTitle').value='';
+  document.getElementById('lessonYouTube').value='';
+  document.getElementById('lessonForm').value='';
+}
+
+function renderLessonsTeacher(){
+  const list=document.getElementById('lessonsListTeacher');
+  list.innerHTML='';
+  lessons.forEach((l,i)=>{
+    const div=document.createElement('div');
+    div.innerHTML=`${l.title} | <button onclick="deleteLesson(${i})">حذف</button>`;
+    list.appendChild(div);
   });
+}
 
-  /* ===== Teacher Add Student ===== */
-  document.getElementById('addStudentBtn')?.addEventListener('click',()=>{
-    const name = document.getElementById('newStudentName').value;
-    if(name){
-      students.push(name);
-      renderStudents();
-      document.getElementById('newStudentName').value='';
+function deleteLesson(index){
+  lessons.splice(index,1);
+  localStorage.setItem('lessons',JSON.stringify(lessons));
+  renderLessonsTeacher();
+}
+
+function renderLessons(){
+  const container=document.getElementById('lessonsList');
+  container.innerHTML='';
+  lessons.forEach(l=>{
+    const btn=document.createElement('button');
+    btn.className='lessonBtn';
+    btn.innerText=l.title;
+    btn.setAttribute('data-src',l.yt);
+    container.appendChild(btn);
+  });
+  attachLessonEvents();
+}
+
+// ---------- Show Video ----------
+function attachLessonEvents(){
+  document.querySelectorAll('.lessonBtn').forEach(btn=>{
+    btn.onclick=()=>{
+      const src=btn.getAttribute('data-src');
+      const container=document.getElementById('lessonVideo');
+      container.innerHTML=`<iframe src="${src}" allowfullscreen loading="lazy"></iframe>`;
+      container.classList.remove('hidden');
+      container.scrollIntoView({behavior:'smooth'});
     }
   });
+}
 
-  function renderStudents(){
-    const list = document.getElementById('studentsList');
-    list.innerHTML='';
-    students.forEach(s=>{
-      const div = document.createElement('div');
-      div.innerText=s;
-      list.appendChild(div);
-    });
-  }
-
-  /* ===== Teacher Add Lesson ===== */
-  document.getElementById('addLessonBtn')?.addEventListener('click',()=>{
-    const title = document.getElementById('lessonTitle').value;
-    const yt = document.getElementById('lessonYouTube').value;
-    const form = document.getElementById('lessonForm').value;
-    if(title){
-      lessons.push({title,yt,form});
-      renderLessons();
-      document.getElementById('lessonTitle').value='';
-      document.getElementById('lessonYouTube').value='';
-      document.getElementById('lessonForm').value='';
-    }
+// ---------- Leaderboard (example) ----------
+function renderLeaderboard(){
+  const container=document.getElementById('leaderboardContainer');
+  container.innerHTML='';
+  students.sort((a,b)=>b.id - a.id).forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.innerText=`${i+1}. ${s.name}`;
+    container.appendChild(div);
   });
-
-  function renderLessons(){
-    const container = document.getElementById('lessonsContainer');
-    container.innerHTML='';
-    lessons.forEach(l=>{
-      const div = document.createElement('div');
-      div.className='lesson-card card';
-      div.innerHTML = `
-        <h4>${l.title}</h4>
-        ${l.yt?`<iframe src="${l.yt}" loading="lazy"></iframe>`:''}
-        ${l.form?`<a href="${l.form}" target="_blank"><button>رابط الفورم</button></a>`:''}
-      `;
-      container.appendChild(div);
-    });
   }
-
-  function renderLessonsTeacher(){
-    const container = document.getElementById('lessonsList');
-    container.innerHTML='';
-    lessons.forEach(l=>{
-      const div = document.createElement('div');
-      div.innerText = l.title;
-      container.appendChild(div);
-    });
-  }
-
-});
