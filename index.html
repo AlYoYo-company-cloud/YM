@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>منصة يحيى محمد</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة يحيى محمد</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body class="dark">
 
@@ -22,8 +22,7 @@
       <option value="teacher">مدرس</option>
     </select>
     <div id="studentFields">
-      <input type="text" id="studentCodeA" placeholder="الكود A">
-      <input type="text" id="studentCodeB" placeholder="الكود B">
+      <input type="text" id="studentCode" placeholder="أدخل الكود المميز">
     </div>
     <div id="teacherFields" class="hidden">
       <input type="text" id="teacherUsername" placeholder="اسم المستخدم">
@@ -36,12 +35,14 @@
   <!-- لوحة الطالب -->
   <section id="studentPanel" class="hidden">
     <h2>مرحباً، <span id="studentName"></span></h2>
-    <input type="text" id="searchLesson" placeholder="ابحث عن درس..." class="search-input">
     <div id="studentNavbar" class="card navbar">
       <button onclick="showSection('lessonsContainer')">الدروس المتاحة</button>
       <button onclick="showSection('leaderboardContainer')">لوحة الصدارة</button>
     </div>
-    <div id="lessonsContainer" class="card container"></div>
+    <div id="lessonsContainer" class="card container">
+      <div id="lessonsList"></div>
+      <div id="lessonVideo" class="video-container hidden"></div>
+    </div>
     <div id="leaderboardContainer" class="card container hidden"></div>
     <button id="studentLogoutBtn">تسجيل الخروج</button>
   </section>
@@ -49,20 +50,23 @@
   <!-- لوحة المدرس -->
   <section id="teacherPanel" class="hidden">
     <h2>لوحة المدرس</h2>
+
     <div id="studentManagement" class="card">
       <h3>إدارة الطلاب</h3>
       <input type="text" id="newStudentName" placeholder="اسم الطالب">
       <button id="addStudentBtn">إضافة طالب</button>
       <div id="studentsList" class="list"></div>
     </div>
+
     <div id="lessonManagement" class="card">
       <h3>إدارة الدروس</h3>
       <input type="text" id="lessonTitle" placeholder="عنوان الدرس">
-      <input type="text" id="lessonYouTube" placeholder="رابط YouTube">
+      <input type="text" id="lessonYouTube" placeholder="رابط YouTube (embed)">
       <input type="text" id="lessonForm" placeholder="رابط Google Form">
       <button id="addLessonBtn">إضافة درس</button>
-      <div id="lessonsList" class="list"></div>
+      <div id="lessonsListTeacher" class="list"></div>
     </div>
+
     <button id="teacherLogoutBtn">تسجيل الخروج</button>
   </section>
 </main>
