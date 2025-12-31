@@ -1,37 +1,30 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-/* ---------- بيانات الطلاب والمدرس ---------- */
-let defaultStudents = [
+/* ---------- بيانات الطلاب ---------- */
+let students = [
   {name:"يحيى حسين أحمد", codeA:"YHA1", codeB:"YHA2", active:true},
   {name:"زياد ايهاب جمال", codeA:"ZIG1", codeB:"ZIG2", active:true},
   {name:"محمد محمد هاشم", codeA:"MMH1", codeB:"MMH2", active:true},
   {name:"عمر سعيد", codeA:"OS1", codeB:"OS2", active:true}
 ];
 
-let students = JSON.parse(localStorage.getItem('students')) || defaultStudents;
-localStorage.setItem('students', JSON.stringify(students));
-
 let teacher = {username:"admin", password:"1234"};
 
-let defaultLessons = [
+/* ---------- الدروس الثابتة ---------- */
+let lessons = [
   {title:"حل على الدعامة في الانسان", yt:"https://www.youtube.com/embed/P_-OHiOmftg"},
   {title:"كورس التأسيس لتالته ثانوي", yt:"https://www.youtube.com/embed/VNZ1ivdGhgE"},
   {title:"الدعامة في النبات", yt:"https://www.youtube.com/embed/ocYoCZesMmA"}
 ];
 
-let lessons = JSON.parse(localStorage.getItem('lessons')) || defaultLessons;
-localStorage.setItem('lessons', JSON.stringify(lessons));
-
-let currentStudent = JSON.parse(localStorage.getItem('currentStudent')) || null;
+let currentStudent = null;
 
 /* ---------- Dark / Light ---------- */
 function toggleTheme(){
   document.body.classList.toggle('dark');
   document.body.classList.toggle('light');
-  localStorage.setItem('theme', document.body.className);
 }
 document.getElementById('themeToggle').onclick = toggleTheme;
-document.body.className = localStorage.getItem('theme') || 'dark';
 
 /* ---------- Utility ---------- */
 function showSection(id){
@@ -48,7 +41,6 @@ function loginStudent(codeA, codeB){
   if(!student.active) return 'الكود معطل';
 
   currentStudent = student;
-  localStorage.setItem('currentStudent', JSON.stringify(student));
   document.getElementById('studentName').innerText = student.name;
 
   showSection('studentPanel');
@@ -83,7 +75,7 @@ document.getElementById('loginBtn').onclick = ()=>{
 
 /* ---------- Logout ---------- */
 document.getElementById('studentLogoutBtn').onclick = ()=>{
-  localStorage.removeItem('currentStudent');
+  currentStudent = null;
   showSection('landing');
 };
 document.getElementById('teacherLogoutBtn').onclick = ()=>showSection('landing');
@@ -105,18 +97,19 @@ function renderLessons(){
     const btn = document.createElement('button');
     btn.className = 'lessonBtn';
     btn.innerText = l.title;
-    btn.dataset.index = index; // إضافة index
+    btn.dataset.index = index;
     list.appendChild(btn);
   });
 }
 
-/* ---------- Show Video with Event Delegation ---------- */
+/* ---------- Show Video ---------- */
 document.getElementById('lessonsList').addEventListener('click', function(e){
   if(e.target && e.target.classList.contains('lessonBtn')){
     const idx = e.target.dataset.index;
     const v = document.getElementById('lessonVideo');
     v.innerHTML = `<iframe src="${lessons[idx].yt}" allowfullscreen></iframe>`;
     v.classList.remove('hidden');
+    v.scrollIntoView({behavior:'smooth'});
   }
 });
 
@@ -156,7 +149,6 @@ function renderStudents(){
 
 window.toggleStudent = function(i){
   students[i].active = !students[i].active;
-  localStorage.setItem('students', JSON.stringify(students));
   renderStudents();
 };
 
@@ -173,8 +165,8 @@ function renderLessonsTeacher(){
 
 window.deleteLesson = function(i){
   lessons.splice(i,1);
-  localStorage.setItem('lessons', JSON.stringify(lessons));
   renderLessonsTeacher();
+  renderLessons();
 };
 
 /* ---------- Add Student ---------- */
@@ -184,7 +176,6 @@ document.getElementById('addStudentBtn').onclick = ()=>{
   const codeA = Math.random().toString(36).substring(2,6).toUpperCase();
   const codeB = Math.random().toString(36).substring(2,6).toUpperCase();
   students.push({name, codeA, codeB, active:true});
-  localStorage.setItem('students', JSON.stringify(students));
   renderStudents();
   document.getElementById('newStudentName').value = '';
 };
@@ -195,8 +186,8 @@ document.getElementById('addLessonBtn').onclick = ()=>{
   const yt = document.getElementById('lessonYouTube').value.trim();
   if(!title || !yt) return alert('ادخل العنوان ورابط الفيديو');
   lessons.push({title, yt});
-  localStorage.setItem('lessons', JSON.stringify(lessons));
   renderLessonsTeacher();
+  renderLessons();
   document.getElementById('lessonTitle').value = '';
   document.getElementById('lessonYouTube').value = '';
 };
