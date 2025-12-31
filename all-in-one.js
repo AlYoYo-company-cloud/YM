@@ -1,4 +1,17 @@
-let students = JSON.parse(localStorage.getItem('students')||'[]');
+// ---------- بيانات الطلاب والمدرس ----------
+let students = [
+  {name:"يحيى حسين أحمد", codeA:"YHA1", codeB:"YHA2", activeA:true, activeB:true},
+  {name:"زياد ايهاب جمال", codeA:"ZIG1", codeB:"ZIG2", activeA:true, activeB:true},
+  {name:"محمد محمد هاشم", codeA:"MMH1", codeB:"MMH2", activeA:true, activeB:true},
+  {name:"عمر سعيد", codeA:"OS1", codeB:"OS2", activeA:true, activeB:true}
+];
+
+let teacher = {username:"admin", password:"1234", codeA:"TCH1", codeB:"TCH2"};
+
+// حفظ واسترجاع من LocalStorage
+if(!localStorage.getItem('students')) localStorage.setItem('students', JSON.stringify(students));
+if(!localStorage.getItem('lessons')) localStorage.setItem('lessons', JSON.stringify([]));
+students = JSON.parse(localStorage.getItem('students'));
 let lessons = JSON.parse(localStorage.getItem('lessons')||'[]');
 let currentStudent = null;
 
@@ -31,10 +44,11 @@ function showSection(sectionId){
 document.getElementById('loginBtn').onclick = ()=>{
   const type = document.getElementById('userType').value;
   if(type==='student'){
-    const code = document.getElementById('studentCode').value.trim();
-    const student = students.find(s=>s.code===code);
+    const codeA = document.getElementById('studentCodeA').value.trim();
+    const codeB = document.getElementById('studentCodeB').value.trim();
+    const student = students.find(s=>s.codeA===codeA && s.codeB===codeB);
     if(!student) {document.getElementById('loginMsg').innerText='الكود غير صحيح'; return;}
-    if(!student.active){document.getElementById('loginMsg').innerText='الكود معطل'; return;}
+    if(!student.activeA || !student.activeB){document.getElementById('loginMsg').innerText='الكود معطل'; return;}
     currentStudent = student;
     document.getElementById('studentName').innerText = student.name;
     showSection('studentPanel');
@@ -43,7 +57,7 @@ document.getElementById('loginBtn').onclick = ()=>{
   } else {
     const username=document.getElementById('teacherUsername').value.trim();
     const password=document.getElementById('teacherPassword').value.trim();
-    if(username==='admin' && password==='1234'){
+    if(username===teacher.username && password===teacher.password){
       showSection('teacherPanel');
       renderStudents();
       renderLessonsTeacher();
@@ -64,14 +78,14 @@ document.getElementById('teacherLogoutBtn').onclick = ()=>showSection('landing')
 function generateCode(){
   const partA=Math.random().toString(36).substring(2,6).toUpperCase();
   const partB=Math.random().toString(36).substring(2,6).toUpperCase();
-  return `${partA}-${partB}`;
+  return {codeA:partA, codeB:partB};
 }
 
 document.getElementById('addStudentBtn').onclick = ()=>{
   const name=document.getElementById('newStudentName').value.trim();
   if(!name) return alert('ادخل اسم الطالب');
-  const code=generateCode();
-  students.push({id:Date.now(), name, code, active:true});
+  const codes = generateCode();
+  students.push({id:Date.now(), name, codeA:codes.codeA, codeB:codes.codeB, activeA:true, activeB:true});
   localStorage.setItem('students',JSON.stringify(students));
   renderStudents();
   document.getElementById('newStudentName').value='';
@@ -82,13 +96,20 @@ function renderStudents(){
   list.innerHTML='';
   students.forEach((s,i)=>{
     const div=document.createElement('div');
-    div.innerHTML=`${s.name} | الكود: ${s.code} | <button onclick="toggleStudent(${i})">${s.active?'إيقاف':'تفعيل'}</button>`;
+    div.innerHTML=`${s.name} | الكود A: ${s.codeA} | الكود B: ${s.codeB} | 
+    <button onclick="toggleStudentA(${i})">${s.activeA?'إيقاف A':'تفعيل A'}</button>
+    <button onclick="toggleStudentB(${i})">${s.activeB?'إيقاف B':'تفعيل B'}</button>`;
     list.appendChild(div);
   });
 }
 
-function toggleStudent(index){
-  students[index].active=!students[index].active;
+function toggleStudentA(index){
+  students[index].activeA=!students[index].activeA;
+  localStorage.setItem('students',JSON.stringify(students));
+  renderStudents();
+}
+function toggleStudentB(index){
+  students[index].activeB=!students[index].activeB;
   localStorage.setItem('students',JSON.stringify(students));
   renderStudents();
 }
@@ -158,4 +179,4 @@ function renderLeaderboard(){
     div.innerText=`${i+1}. ${s.name}`;
     container.appendChild(div);
   });
-  }
+}
