@@ -6,7 +6,14 @@ let defaultStudents = [
   {name:"عمر سعيد", codeA:"OS1", codeB:"OS2", active:true}
 ];
 
-let students = JSON.parse(localStorage.getItem('students')) || defaultStudents;
+// إعادة ضبط البيانات القديمة إذا كانت LocalStorage تحتوي على كود غير متوافق
+let storedStudents = JSON.parse(localStorage.getItem('students'));
+if(!storedStudents || !storedStudents[0].codeA || !storedStudents[0].codeB){
+  students = defaultStudents;
+  localStorage.setItem('students', JSON.stringify(students));
+} else {
+  students = storedStudents;
+}
 
 let teacher = {username:"admin", password:"1234"};
 
@@ -17,7 +24,6 @@ let defaultLessons = [
 ];
 
 let lessons = JSON.parse(localStorage.getItem('lessons')) || defaultLessons;
-
 let currentStudent = JSON.parse(localStorage.getItem('currentStudent')) || null;
 
 // ---------- Dark/Light Mode ----------
@@ -47,12 +53,6 @@ function showSection(sectionId){
 
 // ---------- Student Login ----------
 function loginStudent(codeA, codeB){
-  // إعادة ضبط الكود إذا كان LocalStorage يحتوي على كود قديم
-  if(!students || students.length === 0){
-    students = defaultStudents;
-    localStorage.setItem('students', JSON.stringify(students));
-  }
-
   const student = students.find(s => s.codeA === codeA && s.codeB === codeB);
   if(!student) return 'الكود غير صحيح';
   if(!student.active) return 'الكود معطل';
@@ -71,8 +71,7 @@ document.getElementById('loginBtn').onclick = ()=>{
     const codeA = document.getElementById('studentCodeA').value.trim();
     const codeB = document.getElementById('studentCodeB').value.trim();
     const err = loginStudent(codeA, codeB);
-    if(err) document.getElementById('loginMsg').innerText = err;
-    else document.getElementById('loginMsg').innerText = '';
+    document.getElementById('loginMsg').innerText = err || '';
   } else {
     const username = document.getElementById('teacherUsername').value.trim();
     const password = document.getElementById('teacherPassword').value.trim();
@@ -95,7 +94,7 @@ document.getElementById('studentLogoutBtn').onclick = ()=>{
 }
 document.getElementById('teacherLogoutBtn').onclick = ()=>showSection('landing');
 
-// ---------- Auto-login if session exists ----------
+// ---------- Auto-login ----------
 window.addEventListener('load', ()=>{
   if(currentStudent){
     document.getElementById('studentName').innerText = currentStudent.name;
@@ -203,7 +202,7 @@ function renderLeaderboard(){
   });
 }
 
-// ---------- Buttons to toggle student panels ----------
+// ---------- Toggle student panels ----------
 document.getElementById('showLessonsBtn').onclick = ()=>{
   document.getElementById('lessonsContainer').classList.remove('hidden');
   document.getElementById('leaderboardContainer').classList.add('hidden');
